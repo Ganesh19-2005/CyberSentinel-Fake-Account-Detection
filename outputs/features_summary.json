@@ -1,0 +1,56 @@
+{
+    "total_samples": 10,
+    "total_features": 37,
+    "feature_breakdown": {
+        "numerical_and_behavioral_count": 8,
+        "numerical_and_behavioral_features": [
+            "followers",
+            "following",
+            "posts",
+            "account_age_days",
+            "is_verified",
+            "follower_following_ratio",
+            "reputation_score",
+            "posts_per_day"
+        ],
+        "tfidf_text_count": 20,
+        "tfidf_text_features": [
+            "tfidf_45",
+            "tfidf_928",
+            "tfidf_928_make",
+            "tfidf_bot",
+            "tfidf_bot_45",
+            "tfidf_click",
+            "tfidf_click_link",
+            "tfidf_coder",
+            "tfidf_coder_student",
+            "tfidf_crypto",
+            "tfidf_crypto_offer",
+            "tfidf_daily",
+            "tfidf_daily_daily",
+            "tfidf_fitness",
+            "tfidf_follow",
+            "tfidf_food",
+            "tfidf_money",
+            "tfidf_news",
+            "tfidf_student",
+            "tfidf_travel"
+        ],
+        "graph_structural_count": 9,
+        "graph_structural_features": [
+            "graph_in_degree",
+            "graph_out_degree",
+            "graph_total_degree",
+            "graph_in_out_ratio",
+            "graph_pagerank",
+            "graph_betweenness",
+            "graph_clustering_coefficient",
+            "graph_weak_component_size",
+            "graph_strong_component_size"
+        ]
+    },
+    "target_distribution": {
+        "genuine_count_0": 6,
+        "fake_count_1": 4
+    }
+}

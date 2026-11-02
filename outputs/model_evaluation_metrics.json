@@ -1,0 +1,61 @@
+{
+    "best_model": "Logistic Regression",
+    "results_summary": {
+        "Logistic Regression": {
+            "accuracy": 1.0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1_score": 1.0,
+            "confusion_matrix": [
+                [
+                    2,
+                    0
+                ],
+                [
+                    0,
+                    1
+                ]
+            ],
+            "train_accuracy": 1.0
+        },
+        "Random Forest": {
+            "accuracy": 1.0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1_score": 1.0,
+            "confusion_matrix": [
+                [
+                    2,
+                    0
+                ],
+                [
+                    0,
+                    1
+                ]
+            ],
+            "train_accuracy": 1.0
+        },
+        "Support Vector Machine (SVM)": {
+            "accuracy": 1.0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1_score": 1.0,
+            "confusion_matrix": [
+                [
+                    2,
+                    0
+                ],
+                [
+                    0,
+                    1
+                ]
+            ],
+            "train_accuracy": 1.0
+        }
+    },
+    "academic_limitations_and_notes": {
+        "dataset_nature": "Illustrative prototype benchmark with 10 records (7 train, 3 test).",
+        "real_world_applicability": "The observed high scores are a mathematical artifact of the small, cleanly separable synthetic dataset. These numbers must NOT be cited as real-world predictive performance.",
+        "recommendation": "For B.Tech project thesis defense, validate the architecture on public research benchmarks such as Cresci-2015/2017 or TwiBot-20/22."
+    }
+}
