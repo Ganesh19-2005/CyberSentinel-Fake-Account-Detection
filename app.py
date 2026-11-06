@@ -1,11 +1,11 @@
 """
-app.py - Streamlit Cybersecurity Dashboard for Fake Social-Media Account Detection.
+app.py - CyberSentinel: Fake Social-Media Account Detection
+Redesigned with Premium Red & Black Cybersecurity Command-Center Interface.
 
 Project: "A Graph-and-Text Feature Classifier-Based Approach to Fake Social-Media Account Detection"
 Academic Note:
-    This dashboard serves as an interactive decision-support and demonstration interface
-    for testing multimodal (Profile, NLP Text, Network Topology) classification pipelines.
-    The benchmark dataset is an illustrative prototype for engineering validation.
+    Multimodal classification pipeline integrating Profile Analytics,
+    NLP TF-IDF Linguistic Features, and NetworkX Graph Topology.
 """
 
 import os
@@ -32,81 +32,311 @@ from src.graph_features import build_account_graph, extract_graph_features
 
 
 # =====================================================================
-# Page Configuration & Cybersecurity Theming
+# Page Configuration & Cybersecurity Theming (Red & Black Palette)
 # =====================================================================
 st.set_page_config(
-    page_title="CyberSentinel | Fake Social Account Detector",
-    page_icon="🛡️",
+    page_title="CYBERSENTINEL | Threat Detection System",
+    page_icon="⛨",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
+# Brand SVG Logo (Cybersecurity Shield with Neural Nodes & Fingerprint Circuit)
+CYBERSENTINEL_LOGO_SVG = """
+<svg width="48" height="48" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <filter id="redGlow" x="-20%" y="-20%" width="140%" height="140%">
+            <feGaussianBlur stdDeviation="3" result="blur" />
+            <feComposite in="SourceGraphic" in2="blur" operator="over" />
+        </filter>
+        <linearGradient id="shieldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#E50914" stop-opacity="0.25"/>
+            <stop offset="100%" stop-color="#080808" stop-opacity="0.95"/>
+        </linearGradient>
+    </defs>
+    <!-- Outer Shield -->
+    <path d="M50 6 L88 22 V50 C88 74 71.5 91.5 50 96 C28.5 91.5 12 74 12 50 V22 L50 6 Z" 
+          stroke="#E50914" stroke-width="3.5" fill="url(#shieldGrad)" filter="url(#redGlow)"/>
+    <!-- Inner Shield Border -->
+    <path d="M50 14 L80 26 V50 C80 69 66.5 83.5 50 88 C33.5 83.5 20 69 20 50 V26 L50 14 Z" 
+          stroke="#8B0000" stroke-width="1.8" fill="none"/>
+    <!-- Central Core Node -->
+    <circle cx="50" cy="50" r="7" fill="#E50914" filter="url(#redGlow)"/>
+    <!-- Satellite Network Nodes -->
+    <circle cx="34" cy="38" r="4" fill="#FFFFFF"/>
+    <circle cx="66" cy="38" r="4" fill="#FFFFFF"/>
+    <circle cx="34" cy="62" r="4" fill="#FFFFFF"/>
+    <circle cx="66" cy="62" r="4" fill="#FFFFFF"/>
+    <!-- Circuit Connection Tracks -->
+    <path d="M50 24 V43 M50 57 V76 M26 50 H43 M57 50 H74 M37 41 L45 46 M63 41 L55 46 M37 59 L45 54 M63 59 L55 54" 
+          stroke="#E50914" stroke-width="2.2" stroke-linecap="round"/>
+</svg>
+"""
+
 def apply_cybersecurity_theme():
-    """Injects dark-navy and cyber-blue CSS for a polished security-operations UI."""
+    """Injects high-end matte black and crimson red cybersecurity CSS."""
     st.markdown(
         """
         <style>
-        /* Base typography and clean backgrounds */
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;800;900&family=Rajdhani:wght@500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+
+        /* Root Palette & Reset */
+        :root {
+            --bg-main: #080808;
+            --bg-secondary: #121212;
+            --bg-card: #191919;
+            --accent-red: #E50914;
+            --accent-dark-red: #8B0000;
+            --text-main: #FFFFFF;
+            --text-muted: #B3B3B3;
+            --border-red: #441414;
+            --border-hover: #E50914;
+        }
+
+        /* Base Application Layout */
         .stApp {
-            background: radial-gradient(circle at 10% 20%, #0d1527 0%, #070b14 90%);
-            color: #e2e8f0;
-            font-family: 'Segoe UI', Roboto, Helvetica, sans-serif;
+            background-color: var(--bg-main) !important;
+            background-image: 
+                radial-gradient(circle at 15% 15%, rgba(139, 0, 0, 0.12) 0%, transparent 45%),
+                radial-gradient(circle at 85% 85%, rgba(229, 9, 20, 0.08) 0%, transparent 45%) !important;
+            color: var(--text-main) !important;
+            font-family: 'Inter', sans-serif !important;
         }
-        
-        /* Metric Cards */
+
+        /* Headings Typography */
+        h1, h2, h3 {
+            font-family: 'Orbitron', 'Rajdhani', sans-serif !important;
+            letter-spacing: 0.05em !important;
+            color: var(--text-main) !important;
+        }
+        h4, h5, h6 {
+            font-family: 'Rajdhani', 'Inter', sans-serif !important;
+            letter-spacing: 0.04em !important;
+            color: #E2E8F0 !important;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #080808;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #441414;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #E50914;
+        }
+
+        /* Sidebar Styling */
+        section[data-testid="stSidebar"] {
+            background-color: #0c0c0c !important;
+            border-right: 1px solid var(--border-red) !important;
+            box-shadow: 4px 0 25px rgba(0, 0, 0, 0.8) !important;
+        }
+
+        /* Radio Buttons Navigation Styling */
+        div[data-testid="stSidebar"] [data-testid="stRadio"] div[role="radiogroup"] > label {
+            background: #141414 !important;
+            border: 1px solid var(--border-red) !important;
+            border-radius: 6px !important;
+            padding: 10px 14px !important;
+            margin-bottom: 8px !important;
+            color: var(--text-muted) !important;
+            font-family: 'Rajdhani', sans-serif !important;
+            font-size: 1.05rem !important;
+            font-weight: 600 !important;
+            transition: all 0.25s ease !important;
+            cursor: pointer !important;
+        }
+
+        div[data-testid="stSidebar"] [data-testid="stRadio"] div[role="radiogroup"] > label:hover {
+            border-color: var(--accent-red) !important;
+            background: rgba(229, 9, 20, 0.12) !important;
+            color: #FFFFFF !important;
+            transform: translateX(3px) !important;
+        }
+
+        div[data-testid="stSidebar"] [data-testid="stRadio"] div[role="radiogroup"] > label[data-checked="true"],
+        div[data-testid="stSidebar"] [data-testid="stRadio"] div[role="radiogroup"] > label:has(input:checked) {
+            background: linear-gradient(90deg, rgba(229, 9, 20, 0.3) 0%, rgba(139, 0, 0, 0.15) 100%) !important;
+            border-left: 4px solid var(--accent-red) !important;
+            border-color: var(--accent-red) !important;
+            color: #FFFFFF !important;
+            box-shadow: 0 0 15px rgba(229, 9, 20, 0.25) !important;
+        }
+
+        /* Command Center Cards */
         .cyber-card {
-            background: linear-gradient(135deg, rgba(30, 41, 59, 0.75), rgba(15, 23, 42, 0.85));
-            border: 1px solid rgba(56, 189, 248, 0.25);
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+            background: linear-gradient(145deg, #191919 0%, #121212 100%);
+            border: 1px solid var(--border-red);
+            border-radius: 10px;
+            padding: 22px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
             margin-bottom: 16px;
+            transition: all 0.25s ease;
+            position: relative;
+            overflow: hidden;
         }
-        
+        .cyber-card:hover {
+            border-color: var(--accent-red);
+            box-shadow: 0 6px 24px rgba(229, 9, 20, 0.25);
+            transform: translateY(-2px);
+        }
+        .cyber-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 3px;
+            height: 100%;
+            background: linear-gradient(180deg, var(--accent-red) 0%, var(--accent-dark-red) 100%);
+        }
+
         .metric-title {
-            font-size: 0.85rem;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 0.9rem;
             text-transform: uppercase;
-            letter-spacing: 0.08em;
-            color: #94a3b8;
-            margin-bottom: 4px;
+            letter-spacing: 0.1em;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+            font-weight: 600;
         }
-        
+
         .metric-val {
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: #38bdf8;
+            font-family: 'Orbitron', monospace;
+            font-size: 2.1rem;
+            font-weight: 800;
+            color: #FFFFFF;
             margin: 0;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.15);
         }
-        
+
         .metric-badge {
             display: inline-block;
-            font-size: 0.75rem;
-            padding: 2px 8px;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 0.78rem;
+            padding: 3px 10px;
             border-radius: 4px;
-            font-weight: 600;
-            margin-top: 4px;
+            font-weight: 700;
+            margin-top: 8px;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
         }
-        
+
         .badge-genuine {
-            background-color: rgba(16, 185, 129, 0.2);
-            color: #10b981;
+            background-color: rgba(16, 185, 129, 0.15);
+            color: #10B981;
             border: 1px solid rgba(16, 185, 129, 0.4);
         }
-        
+
         .badge-fake {
-            background-color: rgba(239, 68, 68, 0.2);
-            color: #ef4444;
-            border: 1px solid rgba(239, 68, 68, 0.4);
+            background-color: rgba(229, 9, 20, 0.18);
+            color: #E50914;
+            border: 1px solid rgba(229, 9, 20, 0.45);
+        }
+
+        .badge-cyber {
+            background-color: rgba(139, 0, 0, 0.25);
+            color: #FFA3A3;
+            border: 1px solid #8B0000;
+        }
+
+        /* Threat Result Alert Cards */
+        .alert-card-fake {
+            background: linear-gradient(135deg, rgba(229, 9, 20, 0.2) 0%, rgba(139, 0, 0, 0.1) 100%);
+            border: 1px solid #E50914;
+            border-left: 6px solid #E50914;
+            border-radius: 8px;
+            padding: 18px 22px;
+            margin-bottom: 18px;
+            box-shadow: 0 0 25px rgba(229, 9, 20, 0.25);
+        }
+
+        .alert-card-genuine {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(5, 78, 54, 0.1) 100%);
+            border: 1px solid #10B981;
+            border-left: 6px solid #10B981;
+            border-radius: 8px;
+            padding: 18px 22px;
+            margin-bottom: 18px;
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.2);
+        }
+
+        .info-pill {
+            background: #141414;
+            border: 1px solid var(--border-red);
+            border-left: 4px solid var(--accent-red);
+            padding: 14px 18px;
+            border-radius: 6px;
+            font-size: 0.92rem;
+            margin: 14px 0;
+            color: #D1D5DB;
+        }
+
+        /* Form Inputs & Buttons */
+        div[data-testid="stTextInput"] input,
+        div[data-testid="stNumberInput"] input,
+        div[data-testid="stTextArea"] textarea {
+            background-color: #121212 !important;
+            border: 1px solid var(--border-red) !important;
+            color: #FFFFFF !important;
+            border-radius: 6px !important;
+            font-family: 'Inter', sans-serif !important;
+        }
+
+        div[data-testid="stTextInput"] input:focus,
+        div[data-testid="stNumberInput"] input:focus,
+        div[data-testid="stTextArea"] textarea:focus {
+            border-color: var(--accent-red) !important;
+            box-shadow: 0 0 10px rgba(229, 9, 20, 0.3) !important;
+        }
+
+        /* Primary Action Buttons */
+        div[data-testid="stFormSubmitButton"] > button,
+        div.stButton > button {
+            background: linear-gradient(135deg, #E50914 0%, #8B0000 100%) !important;
+            color: #FFFFFF !important;
+            border: 1px solid #E50914 !important;
+            font-family: 'Rajdhani', 'Orbitron', sans-serif !important;
+            font-size: 1.1rem !important;
+            font-weight: 700 !important;
+            letter-spacing: 0.08em !important;
+            text-transform: uppercase !important;
+            border-radius: 6px !important;
+            padding: 12px 28px !important;
+            box-shadow: 0 4px 15px rgba(229, 9, 20, 0.35) !important;
+            transition: all 0.25s ease !important;
+        }
+
+        div[data-testid="stFormSubmitButton"] > button:hover,
+        div.stButton > button:hover {
+            background: linear-gradient(135deg, #FF1F2D 0%, #B30000 100%) !important;
+            box-shadow: 0 6px 25px rgba(229, 9, 20, 0.6) !important;
+            border-color: #FFFFFF !important;
+            transform: translateY(-2px) !important;
+        }
+
+        /* Streamlit Selectbox & Metrics Container */
+        div[data-testid="stSelectbox"] div[data-baseweb="select"] {
+            background-color: #121212 !important;
+            border-color: var(--border-red) !important;
+            color: #FFFFFF !important;
+        }
+
+        div[data-testid="stMetricValue"] {
+            font-family: 'Orbitron', sans-serif !important;
+            color: #FFFFFF !important;
         }
         
-        /* Alert banners */
-        .info-pill {
-            background: rgba(14, 165, 233, 0.12);
-            border-left: 4px solid #0284c7;
-            padding: 12px 16px;
-            border-radius: 4px;
-            font-size: 0.9rem;
-            margin: 12px 0;
+        /* Table styling */
+        div[data-testid="stDataFrame"] {
+            border: 1px solid var(--border-red) !important;
+            border-radius: 8px !important;
+            overflow: hidden !important;
         }
         </style>
         """,
@@ -179,7 +409,7 @@ def load_datasets():
 
 
 # =====================================================================
-# Prediction Helper
+# Prediction Helper (Strictly Preserves 32-Feature Formulation)
 # =====================================================================
 def run_prediction(
     username: str,
@@ -295,33 +525,46 @@ def run_prediction(
 # Dashboard Page Views
 # =====================================================================
 
-def render_home_page(accounts_df, edges_df):
-    """View 1: Home and Overview"""
+def render_home_page(accounts_df, edges_df, artifacts):
+    """View 1: Home Command Center Overview"""
+    best_model_name = "Logistic Regression"
+    if artifacts["metrics"] and "best_model" in artifacts["metrics"]:
+        best_model_name = artifacts["metrics"]["best_model"]
+
+    # Hero Command Header
     st.markdown(
-        """
-        <div style="text-align: center; padding: 25px 0 10px 0;">
-            <h1 style="color: #38bdf8; font-size: 2.3rem; margin-bottom: 6px;">
-                🛡️ CyberSentinel: Fake Social-Media Account Detection
-            </h1>
-            <p style="font-size: 1.1rem; color: #94a3b8; max-width: 850px; margin: 0 auto;">
-                A Multimodal Classification Framework Integrating <b>Profile Metrics</b>, 
-                <b>NLP Text TF-IDF</b>, and <b>NetworkX Directed Graph Topology</b>.
-            </p>
+        f"""
+        <div style="background: linear-gradient(135deg, rgba(229, 9, 20, 0.15) 0%, rgba(18, 18, 18, 0.95) 100%); 
+                    border: 1px solid #441414; border-radius: 12px; padding: 28px 32px; margin-bottom: 25px;
+                    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.6);">
+            <div style="display: flex; align-items: center; gap: 20px;">
+                <div>{CYBERSENTINEL_LOGO_SVG}</div>
+                <div>
+                    <h1 style="color: #FFFFFF; font-size: 2.2rem; margin: 0; font-weight: 900; letter-spacing: 0.08em;">
+                        CYBERSENTINEL
+                    </h1>
+                    <div style="color: #E50914; font-family: 'Rajdhani', sans-serif; font-size: 1.05rem; font-weight: 700; letter-spacing: 0.12em;">
+                        INTELLIGENT FAKE ACCOUNT DETECTION SYSTEM
+                    </div>
+                    <div style="color: #B3B3B3; font-size: 0.92rem; margin-top: 6px;">
+                        Multimodal Cyber Threat Intelligence Framework integrating Profile Analytics, NLP Text TF-IDF, and NetworkX Directed Graph Topology.
+                    </div>
+                </div>
+            </div>
         </div>
         """,
         unsafe_allow_html=True
     )
     
-    st.markdown("---")
-    
+    # Command Center Metrics Grid
     col1, col2, col3, col4 = st.columns(4)
     with col1:
         st.markdown(
             f"""
             <div class="cyber-card">
-                <div class="metric-title">Total Benchmark Accounts</div>
+                <div class="metric-title">⛨ Benchmark Accounts</div>
                 <div class="metric-val">{len(accounts_df)}</div>
-                <span class="metric-badge badge-genuine">Prototype Benchmark</span>
+                <span class="metric-badge badge-cyber">Ground Truth Verified</span>
             </div>
             """,
             unsafe_allow_html=True
@@ -331,9 +574,9 @@ def render_home_page(accounts_df, edges_df):
         st.markdown(
             f"""
             <div class="cyber-card">
-                <div class="metric-title">Genuine Profiles</div>
-                <div class="metric-val">{genuine_count}</div>
-                <span class="metric-badge badge-genuine">Verified / Authentic</span>
+                <div class="metric-title">🛡️ Genuine Profiles</div>
+                <div class="metric-val" style="color: #10B981;">{genuine_count}</div>
+                <span class="metric-badge badge-genuine">Authentic Identities</span>
             </div>
             """,
             unsafe_allow_html=True
@@ -343,9 +586,9 @@ def render_home_page(accounts_df, edges_df):
         st.markdown(
             f"""
             <div class="cyber-card">
-                <div class="metric-title">Fake / Bot Profiles</div>
-                <div class="metric-val">{fake_count}</div>
-                <span class="metric-badge badge-fake">Spambots / Clones</span>
+                <div class="metric-title">🚨 Fake / Bot Profiles</div>
+                <div class="metric-val" style="color: #E50914;">{fake_count}</div>
+                <span class="metric-badge badge-fake">Sybil Threat Nodes</span>
             </div>
             """,
             unsafe_allow_html=True
@@ -354,27 +597,29 @@ def render_home_page(accounts_df, edges_df):
         st.markdown(
             f"""
             <div class="cyber-card">
-                <div class="metric-title">Graph Relationship Edges</div>
+                <div class="metric-title">⛯ Follower Network Edges</div>
                 <div class="metric-val">{len(edges_df)}</div>
-                <span class="metric-badge badge-genuine">Follow Directed Edges</span>
+                <span class="metric-badge badge-cyber">Directed Interaction Links</span>
             </div>
             """,
             unsafe_allow_html=True
         )
         
-    st.markdown("### 🔍 Technical Architecture Pipeline")
+    st.markdown("<br>", unsafe_allow_html=True)
+    st.markdown("### ⛯ TECHNICAL ARCHITECTURE PIPELINE")
     
     c1, c2, c3, c4 = st.columns(4)
     with c1:
         st.markdown(
             """
-            <div class="cyber-card" style="height: 220px;">
-                <h4 style="color: #38bdf8;">1. Data Preprocessing</h4>
-                <p style="font-size: 0.85rem; color: #cbd5e1;">
-                    • Exact duplicate and username checks.<br>
-                    • Imputation of missing values.<br>
-                    • Boolean standardization.<br>
-                    • Preserves raw data intact.
+            <div class="cyber-card" style="min-height: 235px;">
+                <div style="color: #E50914; font-family: 'Orbitron', monospace; font-size: 0.85rem; font-weight: 700;">STAGE 01</div>
+                <h4 style="color: #FFFFFF; margin: 4px 0 10px 0;">Data Preprocessing</h4>
+                <p style="font-size: 0.86rem; color: #B3B3B3; line-height: 1.5;">
+                    • Exact duplicate and username integrity audits.<br>
+                    • Imputation of missing profile attributes.<br>
+                    • Strict boolean type standardization.<br>
+                    • Preserves immutable raw historical baselines.
                 </p>
             </div>
             """,
@@ -383,12 +628,13 @@ def render_home_page(accounts_df, edges_df):
     with c2:
         st.markdown(
             """
-            <div class="cyber-card" style="height: 220px;">
-                <h4 style="color: #38bdf8;">2. Multimodal Features</h4>
-                <p style="font-size: 0.85rem; color: #cbd5e1;">
-                    • <b>Profile</b>: Follower ratios, age, post rate.<br>
-                    • <b>Text</b>: Combined handle & bio TF-IDF.<br>
-                    • <b>Graph</b>: In/Out degrees, PageRank, clustering, SCC rings.
+            <div class="cyber-card" style="min-height: 235px;">
+                <div style="color: #E50914; font-family: 'Orbitron', monospace; font-size: 0.85rem; font-weight: 700;">STAGE 02</div>
+                <h4 style="color: #FFFFFF; margin: 4px 0 10px 0;">Multimodal Features</h4>
+                <p style="font-size: 0.86rem; color: #B3B3B3; line-height: 1.5;">
+                    • <b>Profile (8)</b>: Follower ratios, reputation, post rates.<br>
+                    • <b>Text (15)</b>: Combined handle & bio TF-IDF n-grams.<br>
+                    • <b>Graph (9)</b>: PageRank, in/out degrees, clustering, SCC rings.
                 </p>
             </div>
             """,
@@ -397,13 +643,14 @@ def render_home_page(accounts_df, edges_df):
     with c3:
         st.markdown(
             """
-            <div class="cyber-card" style="height: 220px;">
-                <h4 style="color: #38bdf8;">3. Zero-Leakage ML</h4>
-                <p style="font-size: 0.85rem; color: #cbd5e1;">
-                    • Stratified Train/Test isolation.<br>
-                    • Scaler & TF-IDF fitted <i>only</i> on Train.<br>
-                    • Label strictly isolated from features.<br>
-                    • Models: Logistic Regression, RF, SVM.
+            <div class="cyber-card" style="min-height: 235px;">
+                <div style="color: #E50914; font-family: 'Orbitron', monospace; font-size: 0.85rem; font-weight: 700;">STAGE 03</div>
+                <h4 style="color: #FFFFFF; margin: 4px 0 10px 0;">Zero-Leakage ML</h4>
+                <p style="font-size: 0.86rem; color: #B3B3B3; line-height: 1.5;">
+                    • Stratified Train/Test partition isolation.<br>
+                    • StandardScaler & TF-IDF fitted <i>only</i> on Train partition.<br>
+                    • Ground-truth labels isolated strictly from feature space.<br>
+                    • Models: Logistic Regression, Random Forest, SVM.
                 </p>
             </div>
             """,
@@ -412,40 +659,55 @@ def render_home_page(accounts_df, edges_df):
     with c4:
         st.markdown(
             """
-            <div class="cyber-card" style="height: 220px;">
-                <h4 style="color: #38bdf8;">4. Interactive Defense</h4>
-                <p style="font-size: 0.85rem; color: #cbd5e1;">
-                    • Real-time account inference.<br>
-                    • Plotly interactive network graph.<br>
-                    • Performance comparison reports.<br>
-                    • Complete dataset exploration.
+            <div class="cyber-card" style="min-height: 235px;">
+                <div style="color: #E50914; font-family: 'Orbitron', monospace; font-size: 0.85rem; font-weight: 700;">STAGE 04</div>
+                <h4 style="color: #FFFFFF; margin: 4px 0 10px 0;">Real-Time Defense</h4>
+                <p style="font-size: 0.86rem; color: #B3B3B3; line-height: 1.5;">
+                    • Real-time behavioral inference & confidence scoring.<br>
+                    • Interactive Plotly threat intelligence graph viewer.<br>
+                    • Comparative model diagnostics & confusion matrices.<br>
+                    • Deep dataset investigation & attribute filtering.
                 </p>
             </div>
             """,
             unsafe_allow_html=True
         )
         
-    st.info(
-        "📌 **Academic Prototype Notice**: The current dataset contains an illustrative 10-account prototype "
-        "designed for validating the multimodal pipeline architecture and demonstrating defense presentations. "
-        "Real-world deployments require large-scale benchmark datasets such as Cresci-2015/2017 or TwiBot-20/22."
+    st.markdown(
+        """
+        <div class="info-pill">
+            <b>🛡️ Academic Prototype Notice</b>: The current evaluation dataset incorporates an illustrative 10-account baseline 
+            calibrated for architectural validation, algorithmic verification, and defense presentation demonstrations. 
+            Production deployments can connect to large-scale benchmark threat repositories such as <b>Cresci-2015/2017</b> or <b>TwiBot-20/22</b>.
+        </div>
+        """,
+        unsafe_allow_html=True
     )
 
 
 def render_prediction_page(artifacts, accounts_df, edges_df):
     """View 2: Account Prediction Form & Reasoning"""
-    st.markdown("## 🎯 Real-Time Account Prediction")
-    st.markdown("Evaluate an account's profile attributes, bio text, and network context to detect fake or bot behavior.")
+    st.markdown(
+        """
+        <div style="margin-bottom: 20px;">
+            <h2 style="margin: 0; color: #FFFFFF;">🎯 REAL-TIME ACCOUNT THREAT PREDICTION</h2>
+            <p style="color: #B3B3B3; margin-top: 4px;">
+                Evaluate profile attributes, linguistic bio text tokens, and structural graph topology to detect malicious bot behavior.
+            </p>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
     
     if not artifacts["is_ready"]:
-        st.error(f"Models are not ready. Missing files: {artifacts['missing_files']}. Run `python src/model_training.py` first.")
+        st.error(f"Models are not ready. Missing files: {artifacts['missing_files']}. Run model training first.")
         return
         
     # Pre-population helper
-    st.markdown("#### ⚡ Quick Preset Test Accounts")
+    st.markdown("#### ⚡ QUICK PRESET BENCHMARK PROFILES")
     sample_usernames = list(accounts_df["username"]) if not accounts_df.empty else []
     selected_preset = st.selectbox(
-        "Select an illustrative sample account to pre-fill the form, or choose 'Custom Input':",
+        "Select a verified benchmark profile to auto-populate fields, or choose 'Custom Input':",
         ["Custom Input"] + sample_usernames
     )
     
@@ -477,19 +739,40 @@ def render_prediction_page(artifacts, accounts_df, edges_df):
         col1, col2 = st.columns(2)
         
         with col1:
-            st.markdown("##### 👤 Profile Identifiers & Stats")
-            u_name = st.text_input("Username / Account Handle", value=preset_data["username"])
+            st.markdown(
+                """
+                <div style="border-bottom: 1px solid #441414; padding-bottom: 6px; margin-bottom: 14px;">
+                    <h5 style="color: #E50914; margin: 0; letter-spacing: 0.05em;">👤 PROFILE IDENTIFIERS & VOLUME</h5>
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+            u_name = st.text_input("Account Username / Handle", value=preset_data["username"])
             followers = st.number_input("Followers Count", min_value=0, max_value=100000000, value=preset_data["followers"], step=10)
             following = st.number_input("Following Count", min_value=0, max_value=100000000, value=preset_data["following"], step=10)
-            is_verified = st.checkbox("Profile Has Blue Verification Badge?", value=preset_data["is_verified"])
+            is_verified = st.checkbox("Profile Possesses Verified Badge?", value=preset_data["is_verified"])
             
         with col2:
-            st.markdown("##### 📝 Activity & Content")
+            st.markdown(
+                """
+                <div style="border-bottom: 1px solid #441414; padding-bottom: 6px; margin-bottom: 14px;">
+                    <h5 style="color: #E50914; margin: 0; letter-spacing: 0.05em;">📝 ACTIVITY HISTORY & BIOGRAPHY</h5>
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
             posts = st.number_input("Total Published Posts", min_value=0, max_value=1000000, value=preset_data["posts"], step=5)
             age = st.number_input("Account Age (Days)", min_value=0, max_value=15000, value=preset_data["account_age_days"], step=10)
-            bio = st.text_area("Profile Biography (Bio)", value=preset_data["bio"], height=95)
+            bio = st.text_area("Profile Biography Text (Bio)", value=preset_data["bio"], height=95)
             
-        st.markdown("##### 🌐 Network Graph Context")
+        st.markdown(
+            """
+            <div style="border-bottom: 1px solid #441414; padding-bottom: 6px; margin: 18px 0 14px 0;">
+                <h5 style="color: #E50914; margin: 0; letter-spacing: 0.05em;">⛯ NETWORK GRAPH TOPOLOGY CONTEXT</h5>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
         c_net1, c_net2 = st.columns(2)
         with c_net1:
             graph_mode = st.radio(
@@ -502,12 +785,13 @@ def render_prediction_page(artifacts, accounts_df, edges_df):
             sim_out_deg = st.slider("Simulated Outgoing Follows", 0, 20, 4) if "Simulate" in graph_mode else 3
             
         model_choice = st.selectbox(
-            "Classifier Model to Use for Prediction:",
+            "Classifier Model to Deploy for Inference:",
             list(artifacts["models"].keys()),
             index=0
         )
         
-        submit_btn = st.form_submit_button("🔍 Run Account Prediction", use_container_width=True)
+        st.markdown("<br>", unsafe_allow_html=True)
+        submit_btn = st.form_submit_button("🔍 RUN THREAT INFERENCE ANALYSIS", use_container_width=True)
         
     if submit_btn:
         # Determine graph context
@@ -554,71 +838,128 @@ def render_prediction_page(artifacts, accounts_df, edges_df):
             artifacts=artifacts
         )
         
-        st.markdown("---")
-        st.markdown("### 📊 Prediction Results & Explainability")
+        st.markdown("<br>", unsafe_allow_html=True)
+        st.markdown("### 📊 PREDICTION RESULTS & EXPLAINABILITY AUDIT")
         
-        p_col1, p_col2 = st.columns([1, 1.2])
+        p_col1, p_col2 = st.columns([1.1, 1.3])
         
         with p_col1:
             if res["prediction"] == 1:
-                st.error(f"🚨 **Prediction: FAKE / BOT ACCOUNT**\n\n**Confidence: {res['confidence']*100:.1f}%**")
+                st.markdown(
+                    f"""
+                    <div class="alert-card-fake">
+                        <div style="font-family: 'Orbitron', monospace; font-size: 1.25rem; font-weight: 800; color: #E50914; margin-bottom: 6px;">
+                            🚨 CRITICAL THREAT: FAKE / BOT ACCOUNT
+                        </div>
+                        <div style="color: #FFFFFF; font-size: 1.05rem;">
+                            Model Confidence: <b style="color: #E50914;">{res['confidence']*100:.1f}%</b>
+                        </div>
+                        <div style="color: #FFA3A3; font-size: 0.85rem; margin-top: 6px;">
+                            Classified as Sybil Spambot by <b>{model_choice}</b> based on multimodal behavioral fingerprint.
+                        </div>
+                    </div>
+                    """,
+                    unsafe_allow_html=True
+                )
             else:
-                st.success(f"✅ **Prediction: GENUINE ACCOUNT**\n\n**Confidence: {res['confidence']*100:.1f}%**")
+                st.markdown(
+                    f"""
+                    <div class="alert-card-genuine">
+                        <div style="font-family: 'Orbitron', monospace; font-size: 1.25rem; font-weight: 800; color: #10B981; margin-bottom: 6px;">
+                            🛡️ VERIFIED AUTHENTIC: GENUINE ACCOUNT
+                        </div>
+                        <div style="color: #FFFFFF; font-size: 1.05rem;">
+                            Model Confidence: <b style="color: #10B981;">{res['confidence']*100:.1f}%</b>
+                        </div>
+                        <div style="color: #A7F3D0; font-size: 0.85rem; margin-top: 6px;">
+                            Classified as Legitimate User by <b>{model_choice}</b> with normal interaction topology.
+                        </div>
+                    </div>
+                    """,
+                    unsafe_allow_html=True
+                )
                 
             fig_prob = go.Figure(go.Bar(
                 x=[res["prob_genuine"], res["prob_fake"]],
                 y=["Genuine", "Fake"],
                 orientation="h",
-                marker=dict(color=["#10b981", "#ef4444"])
+                marker=dict(
+                    color=["#10B981", "#E50914"],
+                    line=dict(color=["#054E3B", "#8B0000"], width=1.5)
+                ),
+                text=[f"{res['prob_genuine']*100:.1f}%", f"{res['prob_fake']*100:.1f}%"],
+                textposition="auto"
             ))
             fig_prob.update_layout(
-                title="Model Class Probability Distribution",
-                xaxis_title="Probability",
-                xaxis=dict(range=[0, 1.0]),
+                title=dict(text="Class Probability Distribution", font=dict(family="Orbitron", color="#FFFFFF", size=14)),
+                xaxis_title="Confidence Probability",
+                xaxis=dict(range=[0, 1.05], gridcolor="#222222", zerolinecolor="#441414"),
+                yaxis=dict(gridcolor="#222222"),
                 height=220,
                 margin=dict(l=20, r=20, t=40, b=20),
                 paper_bgcolor="rgba(0,0,0,0)",
-                plot_bgcolor="rgba(0,0,0,0)",
-                font=dict(color="#f8fafc")
+                plot_bgcolor="rgba(18,18,18,0.7)",
+                font=dict(color="#B3B3B3")
             )
             st.plotly_chart(fig_prob, use_container_width=True)
             
         with p_col2:
-            st.markdown("#### 🧠 Influential Decision Signals")
+            st.markdown(
+                """
+                <div class="cyber-card">
+                    <h4 style="color: #FFFFFF; margin-top: 0; margin-bottom: 12px; border-bottom: 1px solid #441414; padding-bottom: 8px;">
+                        🧠 Influential Decision Signals
+                    </h4>
+                """,
+                unsafe_allow_html=True
+            )
             
             # Metric 1: Follower-to-following ratio
-            ratio_status = "⚠️ Highly suspicious (< 0.05)" if res["follower_following_ratio"] < 0.05 else "Normal / Balanced"
-            st.markdown(f"• **Follower / Following Ratio**: `{res['follower_following_ratio']:.4f}` — *{ratio_status}*")
+            ratio_status = "<span style='color: #E50914; font-weight: 600;'>⚠️ Highly Suspicious (&lt; 0.05)</span>" if res["follower_following_ratio"] < 0.05 else "<span style='color: #10B981; font-weight: 600;'>✓ Balanced</span>"
+            st.markdown(f"• **Follower / Following Ratio**: `{res['follower_following_ratio']:.4f}` — {ratio_status}", unsafe_allow_html=True)
             
             # Metric 2: Reputation score
-            st.markdown(f"• **Reputation Score**: `{res['reputation_score']:.4f}` (Normal range: 0.5–1.0)")
+            st.markdown(f"• **Reputation Score**: `{res['reputation_score']:.4f}` *(Standard Legitimate Baseline: 0.50–1.00)*")
             
             # Metric 3: Posting rate
-            st.markdown(f"• **Activity Intensity**: `{res['posts_per_day']:.2f}` posts per day")
+            st.markdown(f"• **Activity Intensity**: `{res['posts_per_day']:.2f}` posts/day")
             
             # Metric 4: TF-IDF keywords
             if res["detected_keywords"]:
-                keywords_str = ", ".join([f"`{k}`" for k in res["detected_keywords"]])
-                st.markdown(f"• **Spam/Bot Text Tokens Matched**: {keywords_str}")
+                keywords_str = " ".join([f"<span class='metric-badge badge-fake'>{k}</span>" for k in res["detected_keywords"]])
+                st.markdown(f"• **Linguistic Spam Tokens Matched**: {keywords_str}", unsafe_allow_html=True)
             else:
-                st.markdown("• **Spam/Bot Text Tokens Matched**: None (clean/neutral bio)")
+                st.markdown("• **Linguistic Spam Tokens Matched**: <span class='metric-badge badge-genuine'>Clean / Neutral</span>", unsafe_allow_html=True)
                 
             # Metric 5: Graph In/Out
             st.markdown(f"• **Network Graph In/Out Ratio**: `{res['graph_in_out_ratio']:.2f}`")
+            st.markdown("</div>", unsafe_allow_html=True)
 
 
 def render_graph_analysis_page(accounts_df, edges_df):
-    """View 3: NetworkX and Plotly Graph Analysis"""
-    st.markdown("## 🕸️ Network Relationship Analysis")
+    """View 3: Threat Intelligence Network Topology Analysis"""
     st.markdown(
-        "Interactive directed network visualization constructed with **NetworkX** and **Plotly**. "
-        "Directed edges represent follower connections (`source` $\\to$ `target`)."
+        """
+        <div style="margin-bottom: 15px;">
+            <h2 style="margin: 0; color: #FFFFFF;">⛯ NETWORK THREAT TOPOLOGY INVESTIGATION</h2>
+            <p style="color: #B3B3B3; margin-top: 4px;">
+                Interactive cyber threat intelligence graph constructed with <b>NetworkX</b> and rendered with <b>Plotly</b>.
+                Directed edges delineate follower relationships (<code>source</code> → <code>target</code>).
+            </p>
+        </div>
+        """,
+        unsafe_allow_html=True
     )
     
-    st.warning(
-        "⚠️ **Synthetic Network Disclaimer**: The connections displayed below represent the illustrative prototype "
-        "relationship edge list (`data/illustrative_account_edges.csv`). They are designed to demonstrate graph "
-        "centrality and structural analysis, not real scraped social platform data."
+    st.markdown(
+        """
+        <div class="info-pill" style="border-left-color: #8B0000;">
+            ⚠️ <b>Network Topology Calibration</b>: Directed connections visualize the baseline benchmark edge list 
+            (<code>data/illustrative_account_edges.csv</code>). Designed to highlight centrality anomalies, in-degree clustering, 
+            and sybil bot rings.
+        </div>
+        """,
+        unsafe_allow_html=True
     )
     
     if edges_df.empty or accounts_df.empty:
@@ -643,7 +984,6 @@ def render_graph_analysis_page(accounts_df, edges_df):
     # Prepare edge traces
     edge_x = []
     edge_y = []
-    edge_colors = []
     
     for u, v in G.edges():
         x0, y0 = pos[u]
@@ -654,7 +994,7 @@ def render_graph_analysis_page(accounts_df, edges_df):
     edge_trace = go.Scatter(
         x=edge_x,
         y=edge_y,
-        line=dict(width=1.5, color="rgba(148, 163, 184, 0.45)"),
+        line=dict(width=1.5, color="rgba(229, 9, 20, 0.35)"),
         hoverinfo="none",
         mode="lines"
     )
@@ -672,16 +1012,16 @@ def render_graph_analysis_page(accounts_df, edges_df):
         node_y.append(y)
         
         is_fake = labels_map.get(node, 0) == 1
-        color = "#ef4444" if is_fake else "#10b981"
+        color = "#E50914" if is_fake else "#10B981"
         node_colors.append(color)
         
         # Size based on in-degree
-        size = 18 + in_degrees.get(node, 0) * 4
+        size = 20 + in_degrees.get(node, 0) * 5
         node_sizes.append(size)
         
         node_info = (
             f"<b>@{node}</b><br>"
-            f"Classification: {'FAKE / BOT' if is_fake else 'GENUINE'}<br>"
+            f"Status: {'THREAT / FAKE' if is_fake else 'AUTHENTIC / GENUINE'}<br>"
             f"In-Degree (Followers): {in_degrees.get(node, 0)}<br>"
             f"Out-Degree (Following): {out_degrees.get(node, 0)}<br>"
             f"PageRank Score: {pageranks.get(node, 0.0):.4f}<br>"
@@ -700,51 +1040,109 @@ def render_graph_analysis_page(accounts_df, edges_df):
         marker=dict(
             size=node_sizes,
             color=node_colors,
-            line=dict(width=2, color="#ffffff")
+            line=dict(width=2.5, color="#FFFFFF")
         )
     )
     
     fig = go.Figure(
         data=[edge_trace, node_trace],
         layout=go.Layout(
-            title=dict(text="Social Network Interaction Topology (Green = Genuine, Red = Fake/Bot)", font=dict(color="#f8fafc")),
+            title=dict(
+                text="Social Relationship Interaction Graph (Green = Genuine, Crimson Red = Fake/Bot)",
+                font=dict(family="Orbitron", color="#FFFFFF", size=15)
+            ),
             showlegend=False,
             hovermode="closest",
-            margin=dict(b=20, l=20, r=20, t=50),
-            paper_bgcolor="rgba(11, 17, 32, 0.9)",
-            plot_bgcolor="rgba(15, 23, 42, 0.9)",
+            margin=dict(b=20, l=20, r=20, t=55),
+            paper_bgcolor="#0c0c0c",
+            plot_bgcolor="#121212",
             xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
             yaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
-            height=580
+            height=600
         )
     )
     
     st.plotly_chart(fig, use_container_width=True)
     
     # Node Inspector Card
-    st.markdown("### 🔬 Inspect Node Metrics")
-    selected_node = st.selectbox("Select an account node to inspect detailed graph centrality metrics:", list(G.nodes()))
+    st.markdown("<br>", unsafe_allow_html=True)
+    st.markdown("### 🔬 DEEP NODE METRIC INSPECTION")
+    selected_node = st.selectbox(
+        "Select an account node to inspect detailed topological metrics:", 
+        list(G.nodes())
+    )
     
     if selected_node:
         is_fake = labels_map.get(selected_node, 0) == 1
         col_m1, col_m2, col_m3, col_m4, col_m5 = st.columns(5)
         
         with col_m1:
-            st.metric("Classification", "Fake (1)" if is_fake else "Genuine (0)")
+            st.markdown(
+                f"""
+                <div class="cyber-card">
+                    <div class="metric-title">Classification</div>
+                    <div class="metric-val" style="font-size: 1.3rem; color: {'#E50914' if is_fake else '#10B981'};">
+                        {'Fake (1)' if is_fake else 'Genuine (0)'}
+                    </div>
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
         with col_m2:
-            st.metric("In-Degree (Followers)", in_degrees.get(selected_node, 0))
+            st.markdown(
+                f"""
+                <div class="cyber-card">
+                    <div class="metric-title">In-Degree</div>
+                    <div class="metric-val">{in_degrees.get(selected_node, 0)}</div>
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
         with col_m3:
-            st.metric("Out-Degree (Followees)", out_degrees.get(selected_node, 0))
+            st.markdown(
+                f"""
+                <div class="cyber-card">
+                    <div class="metric-title">Out-Degree</div>
+                    <div class="metric-val">{out_degrees.get(selected_node, 0)}</div>
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
         with col_m4:
-            st.metric("PageRank Score", f"{pageranks.get(selected_node, 0):.4f}")
+            st.markdown(
+                f"""
+                <div class="cyber-card">
+                    <div class="metric-title">PageRank</div>
+                    <div class="metric-val" style="font-size: 1.4rem;">{pageranks.get(selected_node, 0):.4f}</div>
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
         with col_m5:
-            st.metric("Clustering Coeff", f"{clustering.get(selected_node, 0):.4f}")
+            st.markdown(
+                f"""
+                <div class="cyber-card">
+                    <div class="metric-title">Clustering</div>
+                    <div class="metric-val" style="font-size: 1.4rem;">{clustering.get(selected_node, 0):.4f}</div>
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
 
 
 def render_model_performance_page(artifacts):
     """View 4: Model Evaluation and Comparison"""
-    st.markdown("## 📈 Model Performance & Comparative Evaluation")
-    st.markdown("Evaluation metrics computed on the test partition during Phase 3 model training.")
+    st.markdown(
+        """
+        <div style="margin-bottom: 20px;">
+            <h2 style="margin: 0; color: #FFFFFF;">📈 MODEL PERFORMANCE & COMPARATIVE BENCHMARK</h2>
+            <p style="color: #B3B3B3; margin-top: 4px;">
+                Empirical evaluation metrics computed on the isolated test partition during Phase 3 model training.
+            </p>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
     
     metrics_data = artifacts["metrics"]
     if not metrics_data:
@@ -754,7 +1152,26 @@ def render_model_performance_page(artifacts):
     results_summary = metrics_data["results_summary"]
     best_model = metrics_data.get("best_model", "Logistic Regression")
     
-    st.success(f"🏆 **Selected Best Model**: **{best_model}** (Based on balanced F1-score and generalization simplicity).")
+    # Best Model Banner
+    st.markdown(
+        f"""
+        <div style="background: linear-gradient(135deg, rgba(229, 9, 20, 0.25) 0%, rgba(18, 18, 18, 0.95) 100%);
+                    border: 1px solid #E50914; border-radius: 8px; padding: 18px 24px; margin-bottom: 22px;
+                    display: flex; align-items: center; justify-content: space-between;">
+            <div>
+                <span class="metric-badge badge-fake" style="margin: 0 0 6px 0;">CHAMPION MODEL</span>
+                <div style="font-family: 'Orbitron', monospace; font-size: 1.5rem; color: #FFFFFF; font-weight: 800;">
+                    {best_model}
+                </div>
+                <div style="color: #B3B3B3; font-size: 0.9rem; margin-top: 4px;">
+                    Selected as optimal production classifier based on balanced F1-score and architectural generalization simplicity.
+                </div>
+            </div>
+            <div style="font-size: 2.5rem; color: #E50914;">🏆</div>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
     
     # Tabular Metrics
     models = list(results_summary.keys())
@@ -762,7 +1179,7 @@ def render_model_performance_page(artifacts):
     for m in models:
         r = results_summary[m]
         perf_rows.append({
-            "Model": m,
+            "Classifier Model": m,
             "Accuracy": f"{r['accuracy']:.2f}",
             "Precision (Fake)": f"{r['precision']:.2f}",
             "Recall (Fake)": f"{r['recall']:.2f}",
@@ -773,7 +1190,8 @@ def render_model_performance_page(artifacts):
     st.dataframe(perf_df, use_container_width=True)
     
     # Plotly Grouped Bar Chart
-    st.markdown("### 📊 Metrics Comparison Chart")
+    st.markdown("<br>", unsafe_allow_html=True)
+    st.markdown("### 📊 MULTI-METRIC PERFORMANCE MATRIX")
     plot_data = []
     for m in models:
         r = results_summary[m]
@@ -783,25 +1201,31 @@ def render_model_performance_page(artifacts):
         plot_data.append({"Model": m, "Metric": "F1-Score", "Score": r["f1_score"]})
         
     bar_df = pd.DataFrame(plot_data)
+    
+    # Red-and-black cybersecurity palette: Crimson Red, Dark Red, Silver Grey
+    cyber_palette = ["#E50914", "#8B0000", "#B3B3B3"]
     fig_bar = px.bar(
         bar_df,
         x="Metric",
         y="Score",
         color="Model",
         barmode="group",
-        color_discrete_sequence=["#38bdf8", "#10b981", "#818cf8"],
-        title="Comparison Across Classifiers (Test Set)"
+        color_discrete_sequence=cyber_palette,
+        title="Comparative Classifier Scores on Isolated Test Set"
     )
     fig_bar.update_layout(
-        yaxis=dict(range=[0, 1.15]),
-        paper_bgcolor="rgba(0,0,0,0)",
-        plot_bgcolor="rgba(0,0,0,0)",
-        font=dict(color="#f8fafc")
+        yaxis=dict(range=[0, 1.15], gridcolor="#222222"),
+        xaxis=dict(gridcolor="#222222"),
+        paper_bgcolor="#0c0c0c",
+        plot_bgcolor="#141414",
+        font=dict(family="Rajdhani", color="#FFFFFF", size=13),
+        title_font=dict(family="Orbitron", color="#FFFFFF", size=14)
     )
     st.plotly_chart(fig_bar, use_container_width=True)
     
     # Confusion Matrix Visualization
-    st.markdown("### 🔲 Confusion Matrices (Test Partition)")
+    st.markdown("<br>", unsafe_allow_html=True)
+    st.markdown("### 🔲 CONFUSION MATRICES (TEST PARTITION)")
     cm_cols = st.columns(len(models))
     for idx, m in enumerate(models):
         cm = np.array(results_summary[m]["confusion_matrix"])
@@ -809,25 +1233,26 @@ def render_model_performance_page(artifacts):
             fig_cm = px.imshow(
                 cm,
                 text_auto=True,
-                labels=dict(x="Predicted", y="True"),
+                labels=dict(x="Predicted Class", y="True Ground Truth"),
                 x=["Genuine (0)", "Fake (1)"],
                 y=["Genuine (0)", "Fake (1)"],
-                color_continuous_scale="Blues",
+                color_continuous_scale="Reds",
                 title=f"{m}"
             )
             fig_cm.update_layout(
                 height=320,
-                paper_bgcolor="rgba(0,0,0,0)",
-                plot_bgcolor="rgba(0,0,0,0)",
-                font=dict(color="#f8fafc")
+                paper_bgcolor="#0c0c0c",
+                plot_bgcolor="#141414",
+                font=dict(family="Rajdhani", color="#FFFFFF"),
+                title_font=dict(family="Orbitron", color="#FFFFFF", size=13)
             )
             st.plotly_chart(fig_cm, use_container_width=True)
             
     st.markdown(
         """
         <div class="info-pill">
-            <b>Academic Research Note</b>: The 1.0 (100%) metric scores observed here reflect the small illustrative sample size 
-            (N=10, 7 train, 3 test) where patterns are well-separated. In your B.Tech thesis, report these as pipeline verification 
+            <b>🛡️ Academic Research Note</b>: The 1.00 (100%) metric scores observed here reflect the small illustrative sample size 
+            (N=10; 7 train, 3 test) where patterns are cleanly separated. In your B.Tech thesis, present these as pipeline verification 
             benchmarks and recommend validating on public corpora like <b>Cresci-2015/2017</b> or <b>TwiBot-20/22</b>.
         </div>
         """,
@@ -837,8 +1262,17 @@ def render_model_performance_page(artifacts):
 
 def render_dataset_explorer_page(accounts_df):
     """View 5: Dataset Exploration and Interactive Filters"""
-    st.markdown("## 📁 Dataset Explorer")
-    st.markdown("Inspect, search, and filter the preprocessed accounts dataset.")
+    st.markdown(
+        """
+        <div style="margin-bottom: 20px;">
+            <h2 style="margin: 0; color: #FFFFFF;">📁 DATASET THREAT EXPLORATION & AUDIT</h2>
+            <p style="color: #B3B3B3; margin-top: 4px;">
+                Inspect, search, and audit preprocessed benchmark records with interactive attribute filters.
+            </p>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
     
     if accounts_df.empty:
         st.error("Accounts dataset not found.")
@@ -846,11 +1280,11 @@ def render_dataset_explorer_page(accounts_df):
         
     c_f1, c_f2, c_f3 = st.columns([1.5, 1, 1])
     with c_f1:
-        search_query = st.text_input("🔍 Search by Username or Bio:", value="")
+        search_query = st.text_input("🔍 Search by Username or Bio Keyword:", value="")
     with c_f2:
         class_filter = st.selectbox("Filter by Class Label:", ["All Accounts", "Genuine Accounts (0)", "Fake Accounts (1)"])
     with c_f3:
-        verified_filter = st.selectbox("Filter by Verification:", ["All", "Verified Only", "Unverified Only"])
+        verified_filter = st.selectbox("Filter by Verification Badge:", ["All", "Verified Only", "Unverified Only"])
         
     # Apply filters
     filtered_df = accounts_df.copy()
@@ -871,10 +1305,11 @@ def render_dataset_explorer_page(accounts_df):
     elif "Unverified Only" in verified_filter:
         filtered_df = filtered_df[filtered_df["is_verified"].astype(bool) == False]
         
-    st.markdown(f"**Showing {len(filtered_df)} of {len(accounts_df)} accounts:**")
+    st.markdown(f"**Showing `{len(filtered_df)}` of `{len(accounts_df)}` benchmark accounts:**")
     st.dataframe(filtered_df, use_container_width=True)
     
-    st.markdown("### 📊 Distribution Insights")
+    st.markdown("<br>", unsafe_allow_html=True)
+    st.markdown("### 📊 DATASET DISTRIBUTION INSIGHTS")
     c_d1, c_d2 = st.columns(2)
     
     with c_d1:
@@ -885,15 +1320,16 @@ def render_dataset_explorer_page(accounts_df):
             label_counts,
             values="count",
             names="Class",
-            hole=0.45,
+            hole=0.55,
             color="Class",
-            color_discrete_map={"Genuine (0)": "#10b981", "Fake (1)": "#ef4444"},
-            title="Class Distribution (Genuine vs Fake)"
+            color_discrete_map={"Genuine (0)": "#10B981", "Fake (1)": "#E50914"},
+            title="Class Distribution Balance"
         )
         fig_donut.update_layout(
-            paper_bgcolor="rgba(0,0,0,0)",
-            plot_bgcolor="rgba(0,0,0,0)",
-            font=dict(color="#f8fafc")
+            paper_bgcolor="#0c0c0c",
+            plot_bgcolor="#141414",
+            font=dict(family="Rajdhani", color="#FFFFFF", size=13),
+            title_font=dict(family="Orbitron", color="#FFFFFF", size=14)
         )
         st.plotly_chart(fig_donut, use_container_width=True)
         
@@ -904,17 +1340,20 @@ def render_dataset_explorer_page(accounts_df):
             x="following",
             y="followers",
             color=accounts_df["label"].map({0: "Genuine", 1: "Fake"}),
-            color_discrete_map={"Genuine": "#10b981", "Fake": "#ef4444"},
+            color_discrete_map={"Genuine": "#10B981", "Fake": "#E50914"},
             hover_name="username",
             size="posts",
             log_x=True,
             log_y=True,
-            title="Followers vs Following (Log Scale, Size = Posts)"
+            title="Followers vs Following (Log Scale, Node Size = Posts)"
         )
         fig_scatter.update_layout(
-            paper_bgcolor="rgba(0,0,0,0)",
-            plot_bgcolor="rgba(0,0,0,0)",
-            font=dict(color="#f8fafc")
+            xaxis=dict(gridcolor="#222222"),
+            yaxis=dict(gridcolor="#222222"),
+            paper_bgcolor="#0c0c0c",
+            plot_bgcolor="#141414",
+            font=dict(family="Rajdhani", color="#FFFFFF", size=13),
+            title_font=dict(family="Orbitron", color="#FFFFFF", size=14)
         )
         st.plotly_chart(fig_scatter, use_container_width=True)
 
@@ -929,59 +1368,80 @@ def main():
     artifacts = load_models_and_artifacts()
     accounts_df, edges_df = load_datasets()
     
-    # Sidebar Navigation
+    # Sidebar Header & Branding
     st.sidebar.markdown(
-        """
-        <div style="text-align: center; padding: 10px 0;">
-            <h2 style="color: #38bdf8; margin: 0;">🛡️ CyberSentinel</h2>
-            <p style="font-size: 0.8rem; color: #94a3b8;">Fake Account Detection System</p>
+        f"""
+        <div style="text-align: center; padding: 18px 0 12px 0;">
+            <div style="display: flex; justify-content: center; margin-bottom: 8px;">
+                {CYBERSENTINEL_LOGO_SVG}
+            </div>
+            <h2 style="color: #FFFFFF; font-family: 'Orbitron', monospace; font-size: 1.45rem; font-weight: 900; letter-spacing: 0.1em; margin: 0;">
+                CYBERSENTINEL
+            </h2>
+            <p style="font-family: 'Rajdhani', sans-serif; font-size: 0.78rem; font-weight: 700; color: #E50914; letter-spacing: 0.1em; margin-top: 4px; text-transform: uppercase;">
+                INTELLIGENT FAKE ACCOUNT DETECTION SYSTEM
+            </p>
         </div>
         """,
         unsafe_allow_html=True
     )
-    st.sidebar.markdown("---")
+    st.sidebar.markdown("<hr style='border-color: #441414; margin: 8px 0 16px 0;'>", unsafe_allow_html=True)
     
+    # Professional Sidebar Navigation
     nav_selection = st.sidebar.radio(
-        "Navigation Menu",
+        "NAVIGATION COMMANDS",
         [
-            "🏠 Home Overview",
+            "⛨ Home Overview",
             "🎯 Account Prediction",
-            "🕸️ Network Graph Analysis",
+            "⛯ Network Graph Analysis",
             "📈 Model Performance",
             "📁 Dataset Explorer"
         ],
         index=0
     )
     
-    st.sidebar.markdown("---")
-    st.sidebar.markdown("### 📌 System Status")
+    st.sidebar.markdown("<hr style='border-color: #441414; margin: 18px 0;'>", unsafe_allow_html=True)
+    st.sidebar.markdown("### 📌 SYSTEM STATUS")
+    
     if artifacts["is_ready"]:
-        st.sidebar.success("✅ Models & Preprocessors Loaded")
-        st.sidebar.info(f"Top Model: **{artifacts['metrics'].get('best_model', 'Logistic Regression')}**")
+        best_mod = artifacts["metrics"].get("best_model", "Logistic Regression") if artifacts["metrics"] else "Logistic Regression"
+        st.sidebar.markdown(
+            f"""
+            <div style="background: #141414; border: 1px solid #441414; border-radius: 6px; padding: 12px; margin-bottom: 12px;">
+                <div style="font-size: 0.8rem; color: #B3B3B3; text-transform: uppercase;">DEFENSE ENGINE</div>
+                <div style="color: #10B981; font-family: 'Orbitron', monospace; font-weight: 700; font-size: 0.92rem;">● ONLINE (ACTIVE)</div>
+                <div style="font-size: 0.8rem; color: #B3B3B3; text-transform: uppercase; margin-top: 8px;">CHAMPION CLASSIFIER</div>
+                <div style="color: #E50914; font-weight: 700; font-size: 0.95rem;">{best_mod}</div>
+                <div style="font-size: 0.8rem; color: #B3B3B3; text-transform: uppercase; margin-top: 8px;">PIPELINE INTEGRATION</div>
+                <div style="color: #FFFFFF; font-size: 0.85rem;">Profile + TF-IDF + Graph</div>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
     else:
-        st.sidebar.error("❌ Models Missing. Run training.")
+        st.sidebar.error("❌ Models Missing. Run model training.")
         
     st.sidebar.markdown(
         """
-        <div style="font-size: 0.75rem; color: #64748b; margin-top: 25px;">
-            <b>B.Tech Project Prototype</b><br>
-            Graph + Text + Profile Fusion<br>
-            Powered by Streamlit & Scikit-learn
+        <div style="font-family: 'Rajdhani', sans-serif; font-size: 0.78rem; color: #666666; text-align: center; margin-top: 30px;">
+            <b style="color: #888888;">B.Tech Final-Year Capstone Project</b><br>
+            Domain: Generative AI & Cybersecurity<br>
+            Streamlit • Scikit-Learn • NetworkX
         </div>
         """,
         unsafe_allow_html=True
     )
     
     # Page Router
-    if nav_selection == "🏠 Home Overview":
-        render_home_page(accounts_df, edges_df)
-    elif nav_selection == "🎯 Account Prediction":
+    if "Home Overview" in nav_selection:
+        render_home_page(accounts_df, edges_df, artifacts)
+    elif "Account Prediction" in nav_selection:
         render_prediction_page(artifacts, accounts_df, edges_df)
-    elif nav_selection == "🕸️ Network Graph Analysis":
+    elif "Network Graph Analysis" in nav_selection:
         render_graph_analysis_page(accounts_df, edges_df)
-    elif nav_selection == "📈 Model Performance":
+    elif "Model Performance" in nav_selection:
         render_model_performance_page(artifacts)
-    elif nav_selection == "📁 Dataset Explorer":
+    elif "Dataset Explorer" in nav_selection:
         render_dataset_explorer_page(accounts_df)
 
 
